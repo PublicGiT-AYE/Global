@@ -14,7 +14,8 @@ int main()
 	cin >> max;
 	cout.setf(ios::fixed);
 	cout.precision(8);
-
+	//подзалупный сыр
+	//подзалупный сыр
 	cout << "Упорядоченный массив > \n";
 	for (short n = 1; n < 8; n++)
 	{
