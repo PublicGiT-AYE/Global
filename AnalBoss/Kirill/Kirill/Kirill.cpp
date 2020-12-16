@@ -3,6 +3,8 @@
 #include <time.h>
 
 int main()
+
+
 {
 	srand(time(0));
 	const int SIZE = 4;
