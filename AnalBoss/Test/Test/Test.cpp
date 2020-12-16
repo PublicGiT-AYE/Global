@@ -1,5 +1,5 @@
 ﻿#include "Header.h"
-//BOMZH
+
 
 int main()
 {
