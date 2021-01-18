@@ -1,75 +1,184 @@
-﻿/********************************************************/
-/*                Лабораторная работа ╧10               */
-/*               Структуры и массивы структур           */
-/*              Пример выполнения. ВарЁант ╧30.         */
-/********************************************************/
-#include <stdio.h>
-#include <string.h>
-/* Описание структуры, которая представляет монастырь */
-struct mon {
-	char name[15]; /* название */
-	char sc;       /* школа */
-	int cnt;       /* количество монахов */
-	float sq;      /* площадь */
-} mm[10]; /* определение массива монастирей */
+﻿#include<iostream>
+#include<windows.h>
+#include<fstream>
 
-int main() {
+using namespace std;
+template <typename T>
+void DeleteArray(T* arr);
+template <typename T>
+void DeleteArray(T** arr, const int rows);
+int* FindStr(char** arr, const int rows, const int colls);
+void FillArrFromFile(char** const arr, const int rows, const int colls);
+void PrintArray(char** arr, const int ROWS, const int COLLS);
+bool* FindWomen(char** arr, const int rows, const int colls);
 
-	struct mon x; /* рабочая переменная */
-	int n;    /* количество элементов в массиве */
-	int i, j; /* текущие индексы в массиве */
-	int m;    /* индекс минимального элемента */
-	float sqx;/* рабочая переменная */
-	 /* Ввод данных */
-	for (n = 0; n < 10; n++) {
-		printf("%d. Введите: название, школу, количество, площадь >",
-			n + 1);
-		scanf_s("%s", mm[n].name, 15);
-		if (!strcmp(mm[n].name, "***")) break;
-		scanf_s("%s", &mm[n].sc);
-		scanf_s("%d", &mm[n].cnt);
-		/* Внимание! Мы обходим ошибку в системе программирования */
-		scanf_s("%f", &sqx); mm[n].sq = sqx;
+int main()
+{
+	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
+
+	int rows = 10;
+	int colls = 50;
+	bool counter = 0;
+	char** Arr = new char* [rows];
+	for (int i = 0; i < rows; i++)
+		Arr[i] = new char[colls] {};
+
+	FillArrFromFile(Arr, rows, colls);
+
+	PrintArray(Arr, rows, colls);
+
+	int* S = FindStr(Arr, rows, colls);
+
+	bool* W = FindWomen(Arr, rows, colls);
+	/*for (int i = 0; i < rows; i++)
+	{
+		cout << W[i];
 	}
-	/* Вывод таблицы */
-	printf("---------------------------------------------\n");
-	printf("|Буддийське монастыри Японии перiода Нара    |\n");
-	printf("|--------------------------------------------|\n");
-	printf("| Название  | Школа |Количество|   Площадь   |\n");
-	printf("|           |       |  монахов | земель(га)  |\n");
-	printf("|-----------|-------|----------|-------------|\n");
-	/* вывод строк фактических данных */
-	for (i = 0; i < n; i++)
-		printf("| %9s |   %c   |       %3d | %-5.1f       |\n",
-			mm[i].name, mm[i].sc, mm[i].cnt, mm[i].sq);
-	printf("---------------------------------------------\n");
-	/* сортировка массива */
-	for (i = 0; i < n - 1; i++) {
-		m = i; /* минимальный элемент - первый */
-		for (j = i + 1; j < n; j++)
-			/* если текущий элемент > минимального,
-			   он становится минимальным */
-			if (strcmp(mm[m].name, mm[j].name) > 0) m = j;
-		if (m > i) {
-			/* перестановка первого и минимального элементов */
-			strcpy(x.name, mm[i].name); x.sc = mm[i].sc;
-			x.cnt = mm[i].cnt; x.sq = mm[i].sq;
-			strcpy(mm[i].name, mm[m].name); mm[i].sc = mm[m].sc;
-			mm[i].cnt = mm[m].cnt; mm[i].sq = mm[m].sq;
-			strcpy(mm[m].name, x.name); mm[m].sc = x.sc;
-			mm[m].cnt = x.cnt; mm[m].sq = x.sq;
+		cout << endl;*/
+	for (int i = 0; i < rows; i++)
+	{
+		if (S[i] > 0)
+		{
+			for (int j = 0; j < colls; j++)
+			{
+				cout << Arr[S[i]-1][j];
+			}
+			cout << endl;
 		}
 	}
-	/* Вывод таблицы */
-	printf("---------------------------------------------\n");
-	printf("|Буддийське монастыри Японии перiода Нара    |\n");
-	printf("|--------------------------------------------|\n");
-	printf("| Название  | Школа |Количество|   Площадь   |\n");
-	printf("|           |       |  монахов | земель(га)  |\n");
-	printf("|-----------|-------|----------|-------------|\n");
-	for (i = 0; i < n; i++)
-		printf("| %9s |   %c   |       %3d | %-5.1f       |\n",
-			mm[i].name, mm[i].sc, mm[i].cnt, mm[i].sq);
-	printf("---------------------------------------------\n");
+
+	//for (int i = 0; i < rows; i++)
+	//{
+
+	//	for (int j = 0; j < colls; j++)
+	//	{
+	//		if (*(W + i)) {
+	//			cout << Arr[i][j];
+	//		}
+	//	}
+	//	cout << endl;
+	//}
+
+
+	DeleteArray(Arr, rows);
+	DeleteArray(W);
+	DeleteArray(S);
 	return 0;
+}
+
+bool* FindWomen(char** arr, const int rows, const int colls)
+{
+	cout << endl;
+	bool* Buff = new bool[rows] {};
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < colls; j++)
+		{
+			if (arr[i][j] == ';' && arr[i][j - 1] == 'W')
+			{
+				Buff[i] = 1;
+			}
+		}
+	}
+	return Buff;
+}
+
+void FillArrFromFile(char** arr, const int rows, const int colls)
+{
+	ifstream ifs("file.txt");
+	arr[rows][colls];
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < colls; j++)
+		{
+			ifs >> arr[i][j];
+			if (arr[i][j] == ';')
+			{
+				j = colls + 1;
+			}
+		}
+	}
+	ifs.close();
+}
+
+int* FindStr(char** arr, const int rows, const int colls)
+{
+	int str = 0;
+	int l = 0;
+	bool p = 0;
+
+	char** Buff = new char* [rows];
+	for (int i = 0; i < rows; i++)
+		Buff[i] = new char[colls] {};
+
+	for (int i = 0; i < rows; i++)
+	{
+		p = 0;
+		for (int j = 0; j < colls; j++)
+		{
+			if (arr[i][j] == ',' && p == 0)
+			{
+				l = 1;
+				while (arr[i][j + l] != ',')
+				{
+					l++;
+				}
+				for (int k = 1; k < l; k++)
+				{
+					Buff[i][k] = arr[i][j + k];
+				}
+				p++;
+			}
+		}
+	}
+	int* counter = new int [rows] {};
+	int z = 0;
+	for (int f = 0; f < rows; f++)
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			str = 0;
+			for (int j = 0; j < colls; j++)
+			{
+				if (i != f && Buff[i][j] == Buff[f][j])
+				{
+					str++;
+				}
+			}
+			if (str == colls)
+			{
+				counter[z] = i + 1;
+				z++;
+			}
+		}
+
+	}
+
+	DeleteArray(Buff);
+	return counter;
+}
+
+template <typename T>
+void DeleteArray(T** arr, const int rows) {
+	for (int i = 0; i < rows; i++) delete[] arr[i];
+	delete[] arr;
+}
+
+template <typename T>
+void DeleteArray(T* arr) {
+	delete[] arr;
+}
+
+void PrintArray(char** arr, const int ROWS, const int COLLS) {
+	for (int i = 0; i < ROWS; i++)
+	{
+		for (int j = 0; j < COLLS; j++)
+		{
+			cout << arr[i][j];
+		}
+		printf("\n");
+	}
+	printf("\b");
 }
